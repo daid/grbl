@@ -43,10 +43,12 @@ void protocol_init()
   iscomment = false;
   report_init_message(); // Welcome message   
   
+#ifdef ENABLE_PINOUT
   PINOUT_DDR &= ~(PINOUT_MASK); // Set as input pins
   PINOUT_PORT |= PINOUT_MASK; // Enable internal pull-up resistors. Normal high operation.
   PINOUT_PCMSK |= PINOUT_MASK;   // Enable specific pins of the Pin Change Interrupt
   PCICR |= (1 << PINOUT_INT);   // Enable Pin Change Interrupt
+#endif
 }
 
 // Executes user startup script, if stored.
@@ -69,6 +71,7 @@ void protocol_execute_startup()
 // only the runtime command execute variable to have the main program execute these when 
 // its ready. This works exactly like the character-based runtime commands when picked off
 // directly from the incoming serial data stream.
+#ifdef ENABLE_PINOUT
 ISR(PINOUT_INT_vect) 
 {
   // Enter only if any pinout pin is actively low.
@@ -82,6 +85,7 @@ ISR(PINOUT_INT_vect)
     }
   }
 }
+#endif
 
 // Executes run-time commands, when required. This is called from various check points in the main
 // program, primarily where there may be a while loop waiting for a buffer to clear space or any
